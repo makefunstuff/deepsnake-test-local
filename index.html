@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>DeepSnake</title>
+<style>
+  :root {
+    --ink: #050810;
+    --neon: #62ffb0;
+    --pink: #ff6fa5;
+    --text: #e9fff7;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 35%, #111a31 0%, #050810 70%);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    touch-action: none;
+  }
+  canvas { display: block; }
+  #hud {
+    position: fixed;
+    inset: 16px 18px auto 18px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .brand {
+    font-size: clamp(18px, 2.4vw, 28px);
+    font-weight: 900;
+    letter-spacing: .16em;
+    color: #dfffe9;
+    text-shadow: 0 0 20px rgba(98,255,176,.65), 0 0 4px rgba(98,255,176,.9);
+  }
+  .brand span { color: var(--neon); }
+  .brand small {
+    display: block;
+    margin-top: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .28em;
+    color: rgba(233,255,247,.48);
+    text-transform: uppercase;
+  }
+  .stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .chip {
+    padding: 8px 12px;
+    border: 1px solid rgba(98,255,176,.24);
+    border-radius: 12px;
+    background: rgba(5,8,16,.55);
+    backdrop-filter: blur(8px);
+    font-size: 11px;
+    letter-spacing: .16em;
+    color: rgba(233,255,247,.65);
+  }
+  .chip b {
+    color: var(--neon);
+    font-size: 17px;
+    letter-spacing: .04em;
+  }
+  .overlay {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: radial-gradient(circle at 50% 45%, rgba(5,8,16,.45) 0%, rgba(5,8,16,.86) 70%);
+    z-index: 10;
+    transition: opacity .25s ease;
+  }
+  .overlay.hidden { display: none; }
+  .card {
+    width: min(560px, 100%);
+    padding: clamp(22px, 5vw, 38px);
+    border: 1px solid rgba(98,255,176,.22);
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(12,20,34,.92), rgba(5,8,16,.92));
+    box-shadow: 0 30px 80px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
+    text-align: center;
+  }
+  h1 {
+    margin: 0 0 10px;
+    font-size: clamp(34px, 7vw, 64px);
+    letter-spacing: .04em;
+    line-height: .95;
+    color: #f2fff8;
+    text-shadow: 0 0 22px rgba(98,255,176,.55);
+  }
+  h1 span { color: var(--neon); }
+  .tagline {
+    margin: 0 0 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgba(233,255,247,.72);
+  }
+  .tagline em { color: var(--pink); font-style: normal; }
+  .funny {
+    margin: 0 0 22px;
+    font-size: 12px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: rgba(233,255,247,.42);
+  }
+  .btn {
+    cursor: pointer;
+    padding: 13px 24px;
+    border: 1px solid rgba(98,255,176,.4);
+    border-radius: 999px;
+    background: linear-gradient(180deg, #2bd17c, #0d8d52);
+    color: #f5fff8;
+    font: inherit;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    box-shadow: 0 0 24px rgba(98,255,176,.25), 0 8px 20px rgba(0,0,0,.35);
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn:active { transform: translateY(1px); }
+  .hint {
+    margin: 18px 0 0;
+    font-size: 12px;
+    color: rgba(233,255,247,.5);
+  }
+  kbd {
+    padding: 2px 6px;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 5px;
+    background: rgba(255,255,255,.06);
+    font-family: inherit;
+    font-size: 11px;
+  }
+  #gameover .card { border-color: rgba(255,111,165,.32); }
+  #gameover h1 { text-shadow: 0 0 22px rgba(255,111,165,.55); }
+  #gameover h1 span { color: var(--pink); }
+  .bigscore {
+    margin: 8px 0 14px;
+    font-size: clamp(30px, 6vw, 48px);
+    font-weight: 900;
+    color: var(--neon);
+  }
+  .death {
+    margin: 0 0 22px;
+    font-size: 14px;
+    color: rgba(233,255,247,.75);
+  }
+  @media (max-width: 640px) {
+    #hud { inset: 10px 12px auto 12px; }
+    .brand small { display: none; }
+    .stats { gap: 6px; }
+    .chip { padding: 6px 9px; font-size: 9px; }
+    .chip b { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+  <div id="hud">
+    <div class="brand">DEEP<span>SNAKE</span><small>a very serious game</small></div>
+    <div class="stats">
+      <div class="chip">SCORE <b id="score">0</b></div>
+      <div class="chip">LENGTH <b id="length">4</b></div>
+      <div class="chip">CHAOS <b id="chaos">1.0</b></div>
+    </div>
+  </div>
+
+  <div id="start" class="overlay">
+    <div class="card">
+      <h1>Deep<span>Snake</span></h1>
+      <p class="tagline">A state-of-the-art neural network trained on <em>one snake</em>.<br>No GPUs were harmed in the making of this game.</p>
+      <p class="funny">Eat donuts · Avoid walls · Avoid yourself</p>
+      <button id="startBtn" class="btn">Start slithering</button>
+      <p class="hint"><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> or <kbd>WASD</kbd> · swipe on touch · <kbd>space</kbd> restart</p>
+    </div>
+  </div>
+
+  <div id="gameover" class="overlay hidden">
+    <div class="card">
+      <h1>Deep<span>Crash</span></h1>
+      <div class="bigscore" id="finalScore">0</div>
+      <p class="death" id="deathMsg">The snake folded into a very small startup.</p>
+      <button id="againBtn" class="btn">Again</button>
+      <p class="hint">Press <kbd>space</kbd> or <kbd>enter</kbd> to reboot the snake</p>
+    </div>
+  </div>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js';
+
+const GRID = 15;
+const HALF = (GRID - 1) / 2;
+const TICK_START = 210;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x050810);
+scene.fog = new THREE.Fog(0x050810, 32, 62);
+
+const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.1, 120);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.18;
+document.body.appendChild(renderer.domElement);
+
+// ---------- Lights ----------
+scene.add(new THREE.HemisphereLight(0x9bdfff, 0x1b1030, 1.15));
+
+const keyLight = new THREE.DirectionalLight(0xffe6b8, 2.3);
+keyLight.position.set(-8, 16, 10);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+keyLight.shadow.camera.left = -14;
+keyLight.shadow.camera.right = 14;
+keyLight.shadow.camera.top = 14;
+keyLight.shadow.camera.bottom = -14;
+keyLight.shadow.camera.near = 1;
+keyLight.shadow.camera.far = 45;
+keyLight.shadow.bias = -0.0005;
+scene.add(keyLight);
+
+const rimLight = new THREE.DirectionalLight(0x7d67ff, 1.2);
+rimLight.position.set(10, 9, -12);
+scene.add(rimLight);
+
+const greenGlow = new THREE.PointLight(0x62ffb0, 10, 14, 2);
+greenGlow.position.set(0, 5, 0);
+scene.add(greenGlow);
+
+// ---------- Board ----------
+const floor = new THREE.Mesh(
+  new THREE.BoxGeometry(GRID + 1.8, 0.22, GRID + 1.8),
+  new THREE.MeshStandardMaterial({ color: 0x08101c, roughness: 0.75, metalness: 0.25 })
+);
+floor.position.y = -0.18;
+floor.receiveShadow = true;
+scene.add(floor);
+
+const tileA = new THREE.MeshStandardMaterial({ color: 0x132738, roughness: 0.65, metalness: 0.18 });
+const tileB = new THREE.MeshStandardMaterial({ color: 0x1b3243, roughness: 0.65, metalness: 0.18 });
+const tileGeo = new THREE.BoxGeometry(0.9, 0.12, 0.9);
+
+for (let x = 0; x < GRID; x++) {
+  for (let z = 0; z < GRID; z++) {
+    const tile = new THREE.Mesh(tileGeo, (x + z) % 2 ? tileA : tileB);
+    tile.position.set(x - HALF, -0.02, z - HALF);
+    tile.receiveShadow = true;
+    scene.add(tile);
+  }
+}
+
+const edgeMat = new THREE.MeshStandardMaterial({
+  color: 0x51ffb0,
+  emissive: 0x20a267,
+  emissiveIntensity: 1.8,
+  roughness: 0.35
+});
+const edgeGeo = new THREE.BoxGeometry(GRID + 0.75, 0.1, 0.1);
+for (const z of [-HALF - 0.45, HALF + 0.45]) {
+  const edge = new THREE.Mesh(edgeGeo, edgeMat);
+  edge.position.set(0, 0.05, z);
+  scene.add(edge);
+}
+const edgeGeoZ = new THREE.BoxGeometry(0.1, 0.1, GRID + 0.75);
+for (const x of [-HALF - 0.45, HALF + 0.45]) {
+  const edge = new THREE.Mesh(edgeGeoZ, edgeMat);
+  edge.position.set(x, 0.05, 0);
+  scene.add(edge);
+}
+
+// Background stars
+const starGeo = new THREE.BufferGeometry();
+const starPositions = [];
+for (let i = 0; i < 260; i++) {
+  const r = 20 + Math.random() * 35;
+  const theta = Math.random() * Math.PI * 2;
+  const phi = Math.random() * Math.PI * 0.55;
+  starPositions.push(
+    Math.cos(theta) * r,
+    6 + Math.sin(phi) * 18,
+    Math.sin(theta) * r
+  );
+}
+starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
+scene.add(new THREE.Points(
+  starGeo,
+  new THREE.PointsMaterial({ color: 0x8fd8ff, size: 0.09, transparent: true, opacity: 0.65, depthWrite: false })
+));
+
+// ---------- Materials ----------
+const bodyMat = new THREE.MeshStandardMaterial({
+  color: 0x63e978,
+  emissive: 0x1a8b4a,
+  emissiveIntensity: 0.55,
+  roughness: 0.38,
+  metalness: 0.08
+});
+const bellyMat = new THREE.MeshStandardMaterial({
+  color: 0x9effb2,
+  emissive: 0x267a4c,
+  emissiveIntensity: 0.4,
+  roughness: 0.45
+});
+const eyeWhiteMat = new THREE.MeshStandardMaterial({
+  color: 0xffffff,
+  emissive: 0xdfffe9,
+  emissiveIntensity: 0.35,
+  roughness: 0.25
+});
+const pupilMat = new THREE.MeshStandardMaterial({
+  color: 0x07100b,
+  roughness: 0.2,
+  metalness: 0.2
+});
+const tongueMat = new THREE.MeshStandardMaterial({
+  color: 0xff5577,
+  emissive: 0x9c1d3d,
+  emissiveIntensity: 0.7,
+  roughness: 0.5
+});
+const particleMats = [
+  new THREE.MeshStandardMaterial({ color: 0xffd36e, emissive: 0xff9a2e, emissiveIntensity: 1.5 }),
+  new THREE.MeshStandardMaterial({ color: 0xff8fb2, emissive: 0xff3f7e, emissiveIntensity: 1.5 }),
+  new THREE.MeshStandardMaterial({ color: 0x62ffb0, emissive: 0x1b8a54, emissiveIntensity: 1.4 })
+];
+const particleGeo = new THREE.SphereGeometry(0.07, 8, 8);
+
+// ---------- Snake head ----------
+const head = new THREE.Group();
+const skull = new THREE.Mesh(new THREE.SphereGeometry(0.55, 24, 18), bodyMat);
+skull.scale.set(1.08, 0.92, 1.16);
+skull.castShadow = true;
+skull.receiveShadow = true;
+head.add(skull);
+
+const snout = new THREE.Mesh(new THREE.SphereGeometry(0.35, 18, 14), bodyMat);
+snout.position.set(0, -0.05, 0.34);
+snout.scale.set(1.0, 0.82, 0.9);
+snout.castShadow = true;
+head.add(snout);
+
+for (const side of [-1, 1]) {
+  const eye = new THREE.Mesh(new THREE.SphereGeometry(0.17, 18, 14), eyeWhiteMat);
+  eye.position.set(side * 0.24, 0.17, 0.42);
+  eye.scale.set(1, 0.95, 1);
+  eye.castShadow = true;
+  head.add(eye);
+
+  const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.075, 12, 10), pupilMat);
+  pupil.position.set(side * 0.28, 0.18, 0.55);
+  head.add(pupil);
+
+  const shine = new THREE.Mesh(
+    new THREE.SphereGeometry(0.022, 8, 6),
+    new THREE.MeshBasicMaterial({ color: 0xffffff })
+  );
+  shine.position.set(side * 0.30, 0.21, 0.60);
+  head.add(shine);
+}
+
+const tongue = new THREE.Mesh(new THREE.ConeGeometry(0.055, 0.34, 8), tongueMat);
+tongue.rotation.x = Math.PI / 2;
+tongue.position.set(0, -0.14, 0.52);
+head.add(tongue);
+
+const nostrilMat = new THREE.MeshStandardMaterial({ color: 0x1a4b2c, roughness: 0.6 });
+for (const side of [-1, 1]) {
+  const nostril = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), nostrilMat);
+  nostril.position.set(side * 0.10, 0.02, 0.63);
+  head.add(nostril);
+}
+scene.add(head);
+
+// Body bead pool
+const beadGeo = new THREE.SphereGeometry(1, 18, 14);
+const beads = [];
+const connectors = [];
+
+function ensurePool(count, pool) {
+  while (pool.length < count) {
+    const mesh = new THREE.Mesh(beadGeo, bodyMat);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    scene.add(mesh);
+    pool.push(mesh);
+  }
+}
+
+// ---------- Donut ----------
+const food = new THREE.Group();
+const dough = new THREE.Mesh(
+  new THREE.TorusGeometry(0.36, 0.15, 14, 32),
+  new THREE.MeshStandardMaterial({
+    color: 0xff8fb2,
+    emissive: 0xff3f7e,
+    emissiveIntensity: 0.85,
+    roughness: 0.42,
+    metalness: 0.05
+  })
+);
+dough.rotation.x = Math.PI / 2;
+dough.castShadow = true;
+food.add(dough);
+
+const icing = new THREE.Mesh(
+  new THREE.TorusGeometry(0.31, 0.105, 12, 32),
+  new THREE.MeshStandardMaterial({
+    color: 0xffd36e,
+    emissive: 0xff9a2e,
+    emissiveIntensity: 0.75,
+    roughness: 0.4
+  })
+);
+icing.rotation.x = Math.PI / 2;
+icing.position.y = 0.07;
+icing.castShadow = true;
+food.add(icing);
+
+const sprinkleMat = new THREE.MeshStandardMaterial({
+  color: 0xffffff,
+  emissive: 0xffffff,
+  emissiveIntensity: 1.2,
+  roughness: 0.3
+});
+for (let i = 0; i < 12; i++) {
+  const a = (i / 12) * Math.PI * 2;
+  const sprinkle = new THREE.Mesh(new THREE.SphereGeometry(0.035, 6, 6), sprinkleMat);
+  sprinkle.position.set(Math.cos(a) * 0.31, 0.13, Math.sin(a) * 0.31);
+  sprinkle.scale.set(0.8, 1.6, 0.8);
+  food.add(sprinkle);
+}
+
+// Soft food halo
+const haloCanvas = document.createElement('canvas');
+haloCanvas.width = 128;
+haloCanvas.height = 128;
+const hctx = haloCanvas.getContext('2d');
+const grad = hctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+grad.addColorStop(0, 'rgba(255,120,170,0.55)');
+grad.addColorStop(0.45, 'rgba(255,80,140,0.18)');
+grad.addColorStop(1, 'rgba(255,80,140,0)');
+hctx.fillStyle = grad;
+hctx.fillRect(0, 0, 128, 128);
+const halo = new THREE.Sprite(
+  new THREE.SpriteMaterial({
+    map: new THREE.CanvasTexture(haloCanvas),
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  })
+);
+halo.scale.set(2.1, 2.1, 1);
+halo.position.y = 0.02;
+food.add(halo);
+scene.add(food);
+
+// ---------- Game state ----------
+let snake = [];
+let dir = { x: 1, z: 0 };
+let pending = [];
+let foodCell = { x: 0, z: 0 };
+let score = 0;
+let tickInterval = TICK_START;
+let alive = false;
+let nextTickAt = 0;
+let particles = [];
+
+function cellWorld(x, z) {
+  return new THREE.Vector3(x - HALF, 0, z - HALF);
+}
+
+function resetSnake() {
+  const cx = Math.floor(GRID / 2);
+  snake = [
+    { x: cx, z: cx },
+    { x: cx - 1, z: cx },
+    { x: cx - 2, z: cx },
+    { x: cx - 3, z: cx }
+  ];
+  dir = { x: 1, z: 0 };
+  pending = [];
+  score = 0;
+  tickInterval = TICK_START;
+}
+
+function spawnFood() {
+  const occupied = new Set(snake.map(c => `${c.x},${c.z}`));
+  const candidates = [];
+  for (let x = 0; x < GRID; x++) {
+    for (let z = 0; z < GRID; z++) {
+      if (!occupied.has(`${x},${z}`)) candidates.push({ x, z });
+    }
+  }
+  if (!candidates.length) return false;
+  const c = candidates[Math.floor(Math.random() * candidates.length)];
+  foodCell = c;
+  const p = cellWorld(c.x, c.z);
+  food.position.set(p.x, 0.62, p.z);
+  return true;
+}
+
+function updateHud() {
+  document.getElementById('score').textContent = score;
+  document.getElementById('length').textContent = snake.length;
+  document.getElementById('chaos').textContent = (1 + score / 6).toFixed(1);
+}
+
+function pushDir(next) {
+  if (!next) return;
+  const last = pending.length ? pending[pending.length - 1] : dir;
+  if (next.x === -last.x && next.z === -last.z) return;
+  if (next.x === last.x && next.z === last.z) return;
+  if (pending.length < 2) pending.push(next);
+}
+
+function burst(position) {
+  for (let i = 0; i < 18; i++) {
+    const p = new THREE.Mesh(particleGeo, particleMats[i % particleMats.length]);
+    p.position.copy(position);
+    const v = new THREE.Vector3(
+      (Math.random() - 0.5) * 1.7,
+      0.7 + Math.random() * 1.8,
+      (Math.random() - 0.5) * 1.7
+    );
+    p.userData.velocity = v;
+    p.userData.life = 1;
+    p.scale.setScalar(0.7 + Math.random() * 0.8);
+    scene.add(p);
+    particles.push(p);
+  }
+}
+
+// ---------- Audio ----------
+let audio = null;
+
+function initAudio() {
+  if (audio) return;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (AC) audio = new AC();
+}
+
+function tone(freq, duration, type = 'sine', volume = 0.06, delay = 0) {
+  if (!audio) return;
+  const t0 = audio.currentTime + delay;
+  const osc = audio.createOscillator();
+  const gain = audio.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, t0);
+  gain.gain.setValueAtTime(volume, t0);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+  osc.connect(gain);
+  gain.connect(audio.destination);
+  osc.start(t0);
+  osc.stop(t0 + duration);
+}
+
+function eatSound() {
+  tone(420, 0.09, 'square', 0.05);
+  tone(660, 0.12, 'square', 0.045, 0.07);
+  tone(880, 0.09, 'triangle', 0.035, 0.15);
+}
+
+function crashSound() {
+  tone(220, 0.22, 'sawtooth', 0.06);
+  tone(140, 0.26, 'sawtooth', 0.05, 0.12);
+}
+
+// ---------- Game flow ----------
+function startGame() {
+  initAudio();
+  resetSnake();
+  spawnFood();
+  alive = true;
+  nextTickAt = performance.now() + tickInterval;
+  updateHud();
+  document.getElementById('start').classList.add('hidden');
+  document.getElementById('gameover').classList.add('hidden');
+}
+
+function endGame(message) {
+  alive = false;
+  crashSound();
+  const headPos = cellWorld(snake[0].x, snake[0].z);
+  headPos.y = 0.55;
+  burst(headPos);
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('deathMsg').textContent = message;
+  document.getElementById('gameover').classList.remove('hidden');
+}
+
+const wallLines = [
+  'You bonked the wall. The wall is fine.',
+  'The snake ran out of grid. Classic.',
+  'A bold move. The wall disagreed.',
+  'DeepSnake hit the border. The border is undefeated.'
+];
+
+function step() {
+  if (pending.length) dir = pending.shift();
+
+  const nx = snake[0].x + dir.x;
+  const nz = snake[0].z + dir.z;
+
+  if (nx < 0 || nx >= GRID || nz < 0 || nz >= GRID) {
+    endGame(wallLines[Math.floor(Math.random() * wallLines.length)]);
+    return;
+  }
+
+  const occupied = new Set(snake.map(c => `${c.x},${c.z}`));
+  if (occupied.has(`${nx},${nz}`)) {
+    endGame('You ate yourself. Technically a snack.');
+    return;
+  }
+
+  const ate = nx === foodCell.x && nz === foodCell.z;
+  snake.unshift({ x: nx, z: nz });
+
+  if (ate) {
+    score += 1;
+    tickInterval = Math.max(88, tickInterval - 7);
+    const p = cellWorld(nx, nz);
+    p.y = 0.62;
+    burst(p);
+    eatSound();
+    if (!spawnFood()) {
+      endGame('The board is full. The snake is now the board.');
+      return;
+    }
+  } else {
+    snake.pop();
+  }
+
+  updateHud();
+}
+
+// ---------- Input ----------
+const dirKey = {
+  arrowup: { x: 0, z: -1 },
+  arrowdown: { x: 0, z: 1 },
+  arrowleft: { x: -1, z: 0 },
+  arrowright: { x: 1, z: 0 },
+  w: { x: 0, z: -1 },
+  s: { x: 0, z: 1 },
+  a: { x: -1, z: 0 },
+  d: { x: 1, z: 0 }
+};
+
+window.addEventListener('keydown', (e) => {
+  const k = e.key.toLowerCase();
+  if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd', ' '].includes(k)) {
+    e.preventDefault();
+  }
+  if (k === ' ' || k === 'enter') {
+    if (!alive) startGame();
+    return;
+  }
+  if (dirKey[k]) {
+    if (!alive) startGame();
+    pushDir(dirKey[k]);
+  }
+});
+
+let touchStart = null;
+window.addEventListener('touchstart', (e) => {
+  if (!alive) return;
+  touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+}, { passive: true });
+
+window.addEventListener('touchend', (e) => {
+  if (!alive || !touchStart) return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - touchStart.x;
+  const dy = t.clientY - touchStart.y;
+  const absX = Math.abs(dx);
+  const absY = Math.abs(dy);
+  if (Math.max(absX, absY) < 24) return;
+  if (absX > absY) {
+    pushDir(dx > 0 ? { x: 1, z: 0 } : { x: -1, z: 0 });
+  } else {
+    pushDir(dy > 0 ? { x: 0, z: 1 } : { x: 0, z: -1 });
+  }
+  touchStart = null;
+});
+
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('againBtn').addEventListener('click', startGame);
+
+// ---------- Camera framing ----------
+function frameCamera() {
+  const aspect = innerWidth / innerHeight;
+  const fov = aspect < 0.8 ? 66 : 42;
+  camera.fov = fov;
+  camera.aspect = aspect;
+
+  const boardHalf = (GRID / 2) * Math.SQRT2 + 1.1;
+  const vHalf = THREE.MathUtils.degToRad(fov) / 2;
+  const hHalf = Math.atan(Math.tan(vHalf) * aspect);
+  const dist = boardHalf / Math.sin(Math.min(vHalf, hHalf)) * 1.03;
+
+  const direction = new THREE.Vector3(0.62, 0.78, 0.62).normalize();
+  camera.position.copy(direction.multiplyScalar(dist));
+  camera.lookAt(0, 0, 0);
+  camera.updateProjectionMatrix();
+}
+
+frameCamera();
+window.addEventListener('resize', () => {
+  renderer.setSize(innerWidth, innerHeight);
+  frameCamera();
+});
+
+// ---------- Render ----------
+resetSnake();
+spawnFood();
+updateHud();
+
+const clock = new THREE.Clock();
+
+function animate() {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  const t = clock.elapsedTime;
+
+  if (alive) {
+    const now = performance.now();
+    while (alive && now >= nextTickAt) {
+      step();
+      nextTickAt += tickInterval;
+    }
+  }
+
+  // Head
+  const hp = cellWorld(snake[0].x, snake[0].z);
+  const headBob = Math.sin(t * 4.2) * 0.035;
+  head.position.set(hp.x, 0.52 + headBob, hp.z);
+  head.rotation.y = Math.atan2(dir.x, dir.z) + Math.sin(t * 1.9) * 0.055;
+  head.rotation.z = Math.sin(t * 2.3) * 0.035;
+  tongue.position.z = 0.52 + Math.sin(t * 7.5) * 0.04;
+  tongue.scale.y = 1 + Math.sin(t * 8) * 0.14;
+
+  // Body beads
+  const n = snake.length;
+  ensurePool(n - 1, beads);
+  ensurePool(n - 2, connectors);
+
+  for (let i = 1; i < n; i++) {
+    const c = snake[i];
+    const p = cellWorld(c.x, c.z);
+    const taper = 1 - (i / (n - 1)) * 0.32;
+    const wiggle = Math.sin(t * 2.3 + i * 0.65) * 0.045;
+    const bead = beads[i - 1];
+    bead.visible = true;
+    bead.position.set(
+      p.x + wiggle,
+      0.38 + Math.sin(t * 3.1 + i * 0.7) * 0.035,
+      p.z - wiggle
+    );
+    bead.scale.setScalar(0.45 * taper);
+  }
+  for (let i = 0; i < beads.length; i++) {
+    if (i >= n - 1) beads[i].visible = false;
+  }
+
+  for (let i = 1; i < n - 1; i++) {
+    const a = snake[i];
+    const b = snake[i + 1];
+    const mid = cellWorld((a.x + b.x) / 2, (a.z + b.z) / 2);
+    const taper = 1 - (i / (n - 1)) * 0.3;
+    const connector = connectors[i - 1];
+    connector.visible = true;
+    connector.position.set(mid.x, 0.37, mid.z);
+    connector.scale.setScalar(0.34 * taper);
+  }
+  for (let i = 0; i < connectors.length; i++) {
+    if (i >= n - 2) connectors[i].visible = false;
+  }
+
+  // Food
+  food.position.y = 0.62 + Math.sin(t * 2.2) * 0.07;
+  food.rotation.y += dt * 1.1;
+  food.rotation.z = Math.sin(t * 1.4) * 0.12;
+
+  // Particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.userData.life -= dt * 2.2;
+    p.position.addScaledVector(p.userData.velocity, dt);
+    p.userData.velocity.y -= dt * 2.7;
+    p.scale.setScalar(Math.max(0.01, p.userData.life * 0.7));
+    if (p.userData.life <= 0) {
+      scene.remove(p);
+      particles.splice(i, 1);
+    }
+  }
+
+  // Gentle camera life
+  const camBase = camera.position.clone();
+  camera.position.x = camBase.x + Math.sin(t * 0.35) * 0.25;
+  camera.position.z = camBase.z + Math.cos(t * 0.35) * 0.25;
+  camera.lookAt(0, 0, 0);
+
+  greenGlow.position.y = 4.4 + Math.sin(t * 1.8) * 0.6;
+
+  renderer.render(scene, camera);
+}
+
+renderer.setAnimationLoop(animate);
+</script>
+</body>
+</html>
