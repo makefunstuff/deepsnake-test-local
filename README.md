@@ -1,6 +1,6 @@
 # DeepSnake
 
-A silly 3D snake game made with Three.js.
+A silly pastel 3D snake game made with Three.js.
 
 The premise: a state-of-the-art neural network trained on exactly one snake.
 Eat donuts, avoid walls, and try not to eat yourself.
