@@ -6,19 +6,20 @@
 <title>DeepSnake</title>
 <style>
   :root {
-    --ink: #050810;
-    --neon: #62ffb0;
-    --pink: #ff6fa5;
-    --text: #e9fff7;
+    --ink: #3f2b47;
+    --neon: #9ee9c4;
+    --pink: #ff8fb0;
+    --cream: #fff4e4;
+    --text: #fff8f0;
   }
   * { box-sizing: border-box; }
   html, body {
     margin: 0;
     height: 100%;
     overflow: hidden;
-    background: radial-gradient(circle at 50% 35%, #111a31 0%, #050810 70%);
+    background: radial-gradient(circle at 50% 30%, #2d244a 0%, #141021 75%);
     color: var(--text);
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: ui-rounded, "Trebuchet MS", system-ui, -apple-system, "Segoe UI", sans-serif;
     touch-action: none;
   }
   canvas { display: block; }
@@ -36,8 +37,8 @@
     font-size: clamp(18px, 2.4vw, 28px);
     font-weight: 900;
     letter-spacing: .16em;
-    color: #dfffe9;
-    text-shadow: 0 0 20px rgba(98,255,176,.65), 0 0 4px rgba(98,255,176,.9);
+    color: #fff3e4;
+    text-shadow: 0 0 18px rgba(255,190,214,.5), 0 2px 0 rgba(255,255,255,.12);
   }
   .brand span { color: var(--neon); }
   .brand small {
@@ -46,7 +47,7 @@
     font-size: 10px;
     font-weight: 600;
     letter-spacing: .28em;
-    color: rgba(233,255,247,.48);
+    color: rgba(255,243,228,.58);
     text-transform: uppercase;
   }
   .stats {
@@ -57,16 +58,16 @@
   }
   .chip {
     padding: 8px 12px;
-    border: 1px solid rgba(98,255,176,.24);
-    border-radius: 12px;
-    background: rgba(5,8,16,.55);
+    border: 1px solid rgba(255,210,225,.3);
+    border-radius: 14px;
+    background: rgba(34,24,48,.5);
     backdrop-filter: blur(8px);
     font-size: 11px;
     letter-spacing: .16em;
-    color: rgba(233,255,247,.65);
+    color: rgba(255,243,228,.72);
   }
   .chip b {
-    color: var(--neon);
+    color: #ffe0a8;
     font-size: 17px;
     letter-spacing: .04em;
   }
@@ -76,7 +77,7 @@
     display: grid;
     place-items: center;
     padding: 20px;
-    background: radial-gradient(circle at 50% 45%, rgba(5,8,16,.45) 0%, rgba(5,8,16,.86) 70%);
+    background: radial-gradient(circle at 50% 45%, rgba(20,16,32,.42) 0%, rgba(20,16,32,.82) 72%);
     z-index: 10;
     transition: opacity .25s ease;
   }
@@ -84,10 +85,11 @@
   .card {
     width: min(560px, 100%);
     padding: clamp(22px, 5vw, 38px);
-    border: 1px solid rgba(98,255,176,.22);
-    border-radius: 22px;
-    background: linear-gradient(180deg, rgba(12,20,34,.92), rgba(5,8,16,.92));
-    box-shadow: 0 30px 80px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
+    border: 1px solid rgba(255,200,220,.75);
+    border-radius: 28px;
+    background: linear-gradient(180deg, #fffaf1, #ffe8f1);
+    box-shadow: 0 30px 80px rgba(30,15,35,.45), inset 0 2px 0 rgba(255,255,255,.85);
+    color: var(--ink);
     text-align: center;
   }
   h1 {
@@ -95,66 +97,100 @@
     font-size: clamp(34px, 7vw, 64px);
     letter-spacing: .04em;
     line-height: .95;
-    color: #f2fff8;
-    text-shadow: 0 0 22px rgba(98,255,176,.55);
+    color: #3f2b47;
+    text-shadow: 0 2px 0 rgba(255,255,255,.8);
   }
-  h1 span { color: var(--neon); }
+  h1 span { color: #ff7d9c; }
   .tagline {
     margin: 0 0 16px;
     font-size: 14px;
     line-height: 1.5;
-    color: rgba(233,255,247,.72);
+    color: #6d5563;
   }
-  .tagline em { color: var(--pink); font-style: normal; }
+  .tagline em { color: #e46687; font-style: normal; }
   .funny {
     margin: 0 0 22px;
     font-size: 12px;
     letter-spacing: .18em;
     text-transform: uppercase;
-    color: rgba(233,255,247,.42);
+    color: #b18d9e;
   }
   .btn {
     cursor: pointer;
     padding: 13px 24px;
-    border: 1px solid rgba(98,255,176,.4);
+    border: 1px solid #79c89a;
     border-radius: 999px;
-    background: linear-gradient(180deg, #2bd17c, #0d8d52);
-    color: #f5fff8;
+    background: linear-gradient(180deg, #b8f2cf, #6ccf94);
+    color: #2f4a3b;
     font: inherit;
     font-weight: 800;
     font-size: 15px;
     letter-spacing: .12em;
     text-transform: uppercase;
-    box-shadow: 0 0 24px rgba(98,255,176,.25), 0 8px 20px rgba(0,0,0,.35);
+    box-shadow: 0 0 20px rgba(180,255,210,.35), 0 8px 20px rgba(60,30,50,.18);
   }
   .btn:hover { filter: brightness(1.12); }
   .btn:active { transform: translateY(1px); }
   .hint {
     margin: 18px 0 0;
     font-size: 12px;
-    color: rgba(233,255,247,.5);
+    color: #8b6e7d;
   }
   kbd {
     padding: 2px 6px;
-    border: 1px solid rgba(255,255,255,.18);
-    border-radius: 5px;
-    background: rgba(255,255,255,.06);
+    border: 1px solid #ecd3dc;
+    border-radius: 6px;
+    background: #fffaf4;
+    color: #5c4552;
     font-family: inherit;
     font-size: 11px;
   }
-  #gameover .card { border-color: rgba(255,111,165,.32); }
-  #gameover h1 { text-shadow: 0 0 22px rgba(255,111,165,.55); }
-  #gameover h1 span { color: var(--pink); }
+  #gameover .card { border-color: #ffb4c8; }
+  #gameover h1 { text-shadow: 0 2px 0 rgba(255,255,255,.8); }
+  #gameover h1 span { color: #f06f91; }
   .bigscore {
     margin: 8px 0 14px;
     font-size: clamp(30px, 6vw, 48px);
     font-weight: 900;
-    color: var(--neon);
+    color: #4c9f72;
   }
   .death {
     margin: 0 0 22px;
     font-size: 14px;
-    color: rgba(233,255,247,.75);
+    color: #755a68;
+  }
+  #pad {
+    position: fixed;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%);
+    display: none;
+    grid-template-columns: repeat(3, 56px);
+    grid-template-rows: repeat(2, 56px);
+    gap: 8px;
+    z-index: 8;
+  }
+  #pad button {
+    width: 56px;
+    height: 56px;
+    border: 1px solid #e9a9bd;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #fff8f2, #ffd9e4);
+    color: #70435a;
+    font: inherit;
+    font-size: 22px;
+    font-weight: 900;
+    box-shadow: 0 8px 18px rgba(30,15,35,.25), inset 0 1px 0 rgba(255,255,255,.8);
+    backdrop-filter: blur(8px);
+    touch-action: none;
+  }
+  #pad button:active { background: #b8f2cf; transform: scale(.95); }
+  #pad .up { grid-column: 2; grid-row: 1; }
+  #pad .left { grid-column: 1; grid-row: 2; }
+  #pad .down { grid-column: 2; grid-row: 2; }
+  #pad .right { grid-column: 3; grid-row: 2; }
+  @media (pointer: coarse), (max-width: 640px) {
+    body.playing #pad { display: grid; }
   }
   @media (max-width: 640px) {
     #hud { inset: 10px 12px auto 12px; }
@@ -162,6 +198,8 @@
     .stats { gap: 6px; }
     .chip { padding: 6px 9px; font-size: 9px; }
     .chip b { font-size: 14px; }
+    #pad { bottom: 12px; grid-template-columns: repeat(3, 52px); grid-template-rows: repeat(2, 52px); gap: 7px; }
+    #pad button { width: 52px; height: 52px; font-size: 20px; }
   }
 </style>
 </head>
@@ -181,7 +219,7 @@
       <p class="tagline">A state-of-the-art neural network trained on <em>one snake</em>.<br>No GPUs were harmed in the making of this game.</p>
       <p class="funny">Eat donuts · Avoid walls · Avoid yourself</p>
       <button id="startBtn" class="btn">Start slithering</button>
-      <p class="hint"><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> or <kbd>WASD</kbd> · swipe on touch · <kbd>space</kbd> restart</p>
+      <p class="hint"><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> or <kbd>WASD</kbd> · pad / swipe on touch · <kbd>space</kbd> restart</p>
     </div>
   </div>
 
@@ -195,6 +233,13 @@
     </div>
   </div>
 
+  <div id="pad" aria-label="Touch controls">
+    <button class="up" data-dir="up" aria-label="Up">↑</button>
+    <button class="left" data-dir="left" aria-label="Left">←</button>
+    <button class="down" data-dir="down" aria-label="Down">↓</button>
+    <button class="right" data-dir="right" aria-label="Right">→</button>
+  </div>
+
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js';
 
@@ -203,8 +248,8 @@ const HALF = (GRID - 1) / 2;
 const TICK_START = 210;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x050810);
-scene.fog = new THREE.Fog(0x050810, 32, 62);
+scene.background = new THREE.Color(0x17142b);
+scene.fog = new THREE.Fog(0x17142b, 34, 68);
 
 const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.1, 120);
 
@@ -214,13 +259,13 @@ renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.18;
+renderer.toneMappingExposure = 1.14;
 document.body.appendChild(renderer.domElement);
 
 // ---------- Lights ----------
-scene.add(new THREE.HemisphereLight(0x9bdfff, 0x1b1030, 1.15));
+scene.add(new THREE.HemisphereLight(0xffe2ef, 0x3d3567, 1.15));
 
-const keyLight = new THREE.DirectionalLight(0xffe6b8, 2.3);
+const keyLight = new THREE.DirectionalLight(0xfff0d4, 2.05);
 keyLight.position.set(-8, 16, 10);
 keyLight.castShadow = true;
 keyLight.shadow.mapSize.set(2048, 2048);
@@ -233,25 +278,25 @@ keyLight.shadow.camera.far = 45;
 keyLight.shadow.bias = -0.0005;
 scene.add(keyLight);
 
-const rimLight = new THREE.DirectionalLight(0x7d67ff, 1.2);
+const rimLight = new THREE.DirectionalLight(0xa8b8ff, 1.0);
 rimLight.position.set(10, 9, -12);
 scene.add(rimLight);
 
-const greenGlow = new THREE.PointLight(0x62ffb0, 10, 14, 2);
+const greenGlow = new THREE.PointLight(0xa8f0c6, 8, 14, 2);
 greenGlow.position.set(0, 5, 0);
 scene.add(greenGlow);
 
 // ---------- Board ----------
 const floor = new THREE.Mesh(
   new THREE.BoxGeometry(GRID + 1.8, 0.22, GRID + 1.8),
-  new THREE.MeshStandardMaterial({ color: 0x08101c, roughness: 0.75, metalness: 0.25 })
+  new THREE.MeshStandardMaterial({ color: 0x28233f, roughness: 0.8, metalness: 0.1 })
 );
 floor.position.y = -0.18;
 floor.receiveShadow = true;
 scene.add(floor);
 
-const tileA = new THREE.MeshStandardMaterial({ color: 0x132738, roughness: 0.65, metalness: 0.18 });
-const tileB = new THREE.MeshStandardMaterial({ color: 0x1b3243, roughness: 0.65, metalness: 0.18 });
+const tileA = new THREE.MeshStandardMaterial({ color: 0x6fb7a8, roughness: 0.78, metalness: 0.02 });
+const tileB = new THREE.MeshStandardMaterial({ color: 0xe1a8b8, roughness: 0.78, metalness: 0.02 });
 const tileGeo = new THREE.BoxGeometry(0.9, 0.12, 0.9);
 
 for (let x = 0; x < GRID; x++) {
@@ -264,10 +309,10 @@ for (let x = 0; x < GRID; x++) {
 }
 
 const edgeMat = new THREE.MeshStandardMaterial({
-  color: 0x51ffb0,
-  emissive: 0x20a267,
-  emissiveIntensity: 1.8,
-  roughness: 0.35
+  color: 0xffd6a3,
+  emissive: 0xd98f4f,
+  emissiveIntensity: 0.9,
+  roughness: 0.45
 });
 const edgeGeo = new THREE.BoxGeometry(GRID + 0.75, 0.1, 0.1);
 for (const z of [-HALF - 0.45, HALF + 0.45]) {
@@ -298,46 +343,74 @@ for (let i = 0; i < 260; i++) {
 starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
 scene.add(new THREE.Points(
   starGeo,
-  new THREE.PointsMaterial({ color: 0x8fd8ff, size: 0.09, transparent: true, opacity: 0.65, depthWrite: false })
+  new THREE.PointsMaterial({ color: 0xffd8e8, size: 0.075, transparent: true, opacity: 0.75, depthWrite: false })
 ));
 
 // ---------- Materials ----------
 const bodyMat = new THREE.MeshStandardMaterial({
-  color: 0x63e978,
-  emissive: 0x1a8b4a,
-  emissiveIntensity: 0.55,
-  roughness: 0.38,
-  metalness: 0.08
+  color: 0x9fe6a9,
+  emissive: 0x4f9d61,
+  emissiveIntensity: 0.35,
+  roughness: 0.55,
+  metalness: 0.03
 });
 const bellyMat = new THREE.MeshStandardMaterial({
-  color: 0x9effb2,
-  emissive: 0x267a4c,
-  emissiveIntensity: 0.4,
-  roughness: 0.45
+  color: 0xfff2c8,
+  emissive: 0xd6a85d,
+  emissiveIntensity: 0.15,
+  roughness: 0.6
 });
 const eyeWhiteMat = new THREE.MeshStandardMaterial({
   color: 0xffffff,
-  emissive: 0xdfffe9,
-  emissiveIntensity: 0.35,
-  roughness: 0.25
+  emissive: 0xfff4e8,
+  emissiveIntensity: 0.25,
+  roughness: 0.3
 });
 const pupilMat = new THREE.MeshStandardMaterial({
-  color: 0x07100b,
-  roughness: 0.2,
-  metalness: 0.2
+  color: 0x2c1c26,
+  roughness: 0.25,
+  metalness: 0.1
 });
 const tongueMat = new THREE.MeshStandardMaterial({
-  color: 0xff5577,
-  emissive: 0x9c1d3d,
-  emissiveIntensity: 0.7,
-  roughness: 0.5
+  color: 0xff8fa8,
+  emissive: 0xc4506c,
+  emissiveIntensity: 0.4,
+  roughness: 0.55
 });
+const cheekMat = new THREE.MeshStandardMaterial({
+  color: 0xffa5b8,
+  emissive: 0xd15c77,
+  emissiveIntensity: 0.25,
+  roughness: 0.6
+});
+const mouthMat = new THREE.MeshStandardMaterial({ color: 0x7d4055, roughness: 0.55 });
+const sprinkleMats = [
+  new THREE.MeshStandardMaterial({ color: 0xfff3b0, emissive: 0xffcf6b, emissiveIntensity: 0.5, roughness: 0.4 }),
+  new THREE.MeshStandardMaterial({ color: 0x9fd7ff, emissive: 0x6fb7e0, emissiveIntensity: 0.4, roughness: 0.4 }),
+  new THREE.MeshStandardMaterial({ color: 0xffb7c9, emissive: 0xe66f8c, emissiveIntensity: 0.45, roughness: 0.4 }),
+  new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfff4e8, emissiveIntensity: 0.35, roughness: 0.35 })
+];
 const particleMats = [
-  new THREE.MeshStandardMaterial({ color: 0xffd36e, emissive: 0xff9a2e, emissiveIntensity: 1.5 }),
-  new THREE.MeshStandardMaterial({ color: 0xff8fb2, emissive: 0xff3f7e, emissiveIntensity: 1.5 }),
-  new THREE.MeshStandardMaterial({ color: 0x62ffb0, emissive: 0x1b8a54, emissiveIntensity: 1.4 })
+  new THREE.MeshStandardMaterial({ color: 0xffe0a8, emissive: 0xffc26b, emissiveIntensity: 0.9 }),
+  new THREE.MeshStandardMaterial({ color: 0xffa9be, emissive: 0xff6f93, emissiveIntensity: 0.8 }),
+  new THREE.MeshStandardMaterial({ color: 0xb8f2cf, emissive: 0x6ccf94, emissiveIntensity: 0.7 })
 ];
 const particleGeo = new THREE.SphereGeometry(0.07, 8, 8);
+
+const heartShape = new THREE.Shape();
+heartShape.moveTo(0, 0.16);
+heartShape.bezierCurveTo(0.16, 0.28, 0.34, 0.18, 0.30, 0.02);
+heartShape.bezierCurveTo(0.27, -0.16, 0.08, -0.28, 0, -0.38);
+heartShape.bezierCurveTo(-0.08, -0.28, -0.27, -0.16, -0.30, 0.02);
+heartShape.bezierCurveTo(-0.34, 0.18, -0.16, 0.28, 0, 0.16);
+const heartGeo = new THREE.ExtrudeGeometry(heartShape, {
+  depth: 0.06,
+  bevelEnabled: true,
+  bevelSize: 0.022,
+  bevelThickness: 0.022,
+  bevelSegments: 2
+});
+heartGeo.center();
 
 // ---------- Snake head ----------
 const head = new THREE.Group();
@@ -354,27 +427,32 @@ snout.castShadow = true;
 head.add(snout);
 
 for (const side of [-1, 1]) {
-  const eye = new THREE.Mesh(new THREE.SphereGeometry(0.17, 18, 14), eyeWhiteMat);
-  eye.position.set(side * 0.24, 0.17, 0.42);
-  eye.scale.set(1, 0.95, 1);
+  const eye = new THREE.Mesh(new THREE.SphereGeometry(0.20, 18, 14), eyeWhiteMat);
+  eye.position.set(side * 0.24, 0.20, 0.42);
+  eye.scale.set(1, 0.98, 1);
   eye.castShadow = true;
   head.add(eye);
 
-  const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.075, 12, 10), pupilMat);
-  pupil.position.set(side * 0.28, 0.18, 0.55);
+  const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.092, 12, 10), pupilMat);
+  pupil.position.set(side * 0.27, 0.21, 0.58);
   head.add(pupil);
 
   const shine = new THREE.Mesh(
-    new THREE.SphereGeometry(0.022, 8, 6),
+    new THREE.SphereGeometry(0.030, 8, 6),
     new THREE.MeshBasicMaterial({ color: 0xffffff })
   );
-  shine.position.set(side * 0.30, 0.21, 0.60);
+  shine.position.set(side * 0.30, 0.25, 0.64);
   head.add(shine);
+
+  const cheek = new THREE.Mesh(new THREE.SphereGeometry(0.095, 12, 10), cheekMat);
+  cheek.position.set(side * 0.40, -0.03, 0.44);
+  cheek.scale.set(1.1, 0.7, 0.55);
+  head.add(cheek);
 }
 
 const tongue = new THREE.Mesh(new THREE.ConeGeometry(0.055, 0.34, 8), tongueMat);
 tongue.rotation.x = Math.PI / 2;
-tongue.position.set(0, -0.14, 0.52);
+tongue.position.set(0, -0.18, 0.56);
 head.add(tongue);
 
 const nostrilMat = new THREE.MeshStandardMaterial({ color: 0x1a4b2c, roughness: 0.6 });
@@ -383,6 +461,18 @@ for (const side of [-1, 1]) {
   nostril.position.set(side * 0.10, 0.02, 0.63);
   head.add(nostril);
 }
+
+const smileCurve = new THREE.CatmullRomCurve3([
+  new THREE.Vector3(-0.14, -0.06, 0.69),
+  new THREE.Vector3(0, -0.14, 0.75),
+  new THREE.Vector3(0.14, -0.06, 0.69)
+]);
+const smile = new THREE.Mesh(
+  new THREE.TubeGeometry(smileCurve, 14, 0.018, 6, false),
+  mouthMat
+);
+head.add(smile);
+head.scale.setScalar(1.12);
 scene.add(head);
 
 // Body bead pool
@@ -390,9 +480,9 @@ const beadGeo = new THREE.SphereGeometry(1, 18, 14);
 const beads = [];
 const connectors = [];
 
-function ensurePool(count, pool) {
+function ensurePool(count, pool, material = bodyMat) {
   while (pool.length < count) {
-    const mesh = new THREE.Mesh(beadGeo, bodyMat);
+    const mesh = new THREE.Mesh(beadGeo, material);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     scene.add(mesh);
@@ -405,11 +495,11 @@ const food = new THREE.Group();
 const dough = new THREE.Mesh(
   new THREE.TorusGeometry(0.36, 0.15, 14, 32),
   new THREE.MeshStandardMaterial({
-    color: 0xff8fb2,
-    emissive: 0xff3f7e,
-    emissiveIntensity: 0.85,
-    roughness: 0.42,
-    metalness: 0.05
+    color: 0xffb3c8,
+    emissive: 0xff7f9f,
+    emissiveIntensity: 0.35,
+    roughness: 0.55,
+    metalness: 0.02
   })
 );
 dough.rotation.x = Math.PI / 2;
@@ -419,10 +509,10 @@ food.add(dough);
 const icing = new THREE.Mesh(
   new THREE.TorusGeometry(0.31, 0.105, 12, 32),
   new THREE.MeshStandardMaterial({
-    color: 0xffd36e,
-    emissive: 0xff9a2e,
-    emissiveIntensity: 0.75,
-    roughness: 0.4
+    color: 0xfff0b3,
+    emissive: 0xffcf6b,
+    emissiveIntensity: 0.25,
+    roughness: 0.5
   })
 );
 icing.rotation.x = Math.PI / 2;
@@ -430,15 +520,12 @@ icing.position.y = 0.07;
 icing.castShadow = true;
 food.add(icing);
 
-const sprinkleMat = new THREE.MeshStandardMaterial({
-  color: 0xffffff,
-  emissive: 0xffffff,
-  emissiveIntensity: 1.2,
-  roughness: 0.3
-});
 for (let i = 0; i < 12; i++) {
   const a = (i / 12) * Math.PI * 2;
-  const sprinkle = new THREE.Mesh(new THREE.SphereGeometry(0.035, 6, 6), sprinkleMat);
+  const sprinkle = new THREE.Mesh(
+    new THREE.SphereGeometry(0.035, 6, 6),
+    sprinkleMats[i % sprinkleMats.length]
+  );
   sprinkle.position.set(Math.cos(a) * 0.31, 0.13, Math.sin(a) * 0.31);
   sprinkle.scale.set(0.8, 1.6, 0.8);
   food.add(sprinkle);
@@ -466,6 +553,31 @@ const halo = new THREE.Sprite(
 halo.scale.set(2.1, 2.1, 1);
 halo.position.y = 0.02;
 food.add(halo);
+
+const foodLight = new THREE.PointLight(0xff9fbf, 3, 3.2, 2);
+foodLight.position.y = 0.15;
+food.add(foodLight);
+
+const ambientHearts = new THREE.Group();
+const heartMat = new THREE.MeshStandardMaterial({
+  color: 0xffb7c9,
+  emissive: 0xf06f91,
+  emissiveIntensity: 0.25,
+  transparent: true,
+  opacity: 0.65,
+  roughness: 0.5
+});
+for (let i = 0; i < 7; i++) {
+  const h = new THREE.Mesh(heartGeo, heartMat);
+  const a = Math.random() * Math.PI * 2;
+  const r = 9 + Math.random() * 5;
+  h.position.set(Math.cos(a) * r, 1.5 + Math.random() * 3.5, Math.sin(a) * r);
+  h.scale.setScalar(0.12 + Math.random() * 0.13);
+  h.userData.baseY = h.position.y;
+  h.userData.phase = Math.random() * Math.PI * 2;
+  ambientHearts.add(h);
+}
+scene.add(ambientHearts);
 scene.add(food);
 
 // ---------- Game state ----------
@@ -529,8 +641,10 @@ function pushDir(next) {
 
 function burst(position) {
   for (let i = 0; i < 18; i++) {
-    const p = new THREE.Mesh(particleGeo, particleMats[i % particleMats.length]);
+    const isHeart = i % 3 === 0;
+    const p = new THREE.Mesh(isHeart ? heartGeo : particleGeo, particleMats[i % particleMats.length]);
     p.position.copy(position);
+    p.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
     const v = new THREE.Vector3(
       (Math.random() - 0.5) * 1.7,
       0.7 + Math.random() * 1.8,
@@ -587,6 +701,7 @@ function startGame() {
   alive = true;
   nextTickAt = performance.now() + tickInterval;
   updateHud();
+  document.body.classList.add('playing');
   document.getElementById('start').classList.add('hidden');
   document.getElementById('gameover').classList.add('hidden');
 }
@@ -599,6 +714,7 @@ function endGame(message) {
   burst(headPos);
   document.getElementById('finalScore').textContent = score;
   document.getElementById('deathMsg').textContent = message;
+  document.body.classList.remove('playing');
   document.getElementById('gameover').classList.remove('hidden');
 }
 
@@ -676,12 +792,12 @@ window.addEventListener('keydown', (e) => {
 
 let touchStart = null;
 window.addEventListener('touchstart', (e) => {
-  if (!alive) return;
+  if (!alive || e.target.closest('#pad')) return;
   touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
 }, { passive: true });
 
 window.addEventListener('touchend', (e) => {
-  if (!alive || !touchStart) return;
+  if (!alive || !touchStart || e.target.closest('#pad')) return;
   const t = e.changedTouches[0];
   const dx = t.clientX - touchStart.x;
   const dy = t.clientY - touchStart.y;
@@ -699,7 +815,22 @@ window.addEventListener('touchend', (e) => {
 document.getElementById('startBtn').addEventListener('click', startGame);
 document.getElementById('againBtn').addEventListener('click', startGame);
 
+const pad = document.getElementById('pad');
+const padDirs = {
+  up: { x: 0, z: -1 },
+  down: { x: 0, z: 1 },
+  left: { x: -1, z: 0 },
+  right: { x: 1, z: 0 }
+};
+pad.addEventListener('pointerdown', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn || !alive) return;
+  e.preventDefault();
+  pushDir(padDirs[btn.dataset.dir]);
+});
+
 // ---------- Camera framing ----------
+const cameraBasePosition = new THREE.Vector3();
 function frameCamera() {
   const aspect = innerWidth / innerHeight;
   const fov = aspect < 0.8 ? 66 : 42;
@@ -714,6 +845,7 @@ function frameCamera() {
   const direction = new THREE.Vector3(0.62, 0.78, 0.62).normalize();
   camera.position.copy(direction.multiplyScalar(dist));
   camera.lookAt(0, 0, 0);
+  cameraBasePosition.copy(camera.position);
   camera.updateProjectionMatrix();
 }
 
@@ -754,7 +886,7 @@ function animate() {
   // Body beads
   const n = snake.length;
   ensurePool(n - 1, beads);
-  ensurePool(n - 2, connectors);
+  ensurePool(n - 2, connectors, bellyMat);
 
   for (let i = 1; i < n; i++) {
     const c = snake[i];
@@ -807,12 +939,17 @@ function animate() {
   }
 
   // Gentle camera life
-  const camBase = camera.position.clone();
-  camera.position.x = camBase.x + Math.sin(t * 0.35) * 0.25;
-  camera.position.z = camBase.z + Math.cos(t * 0.35) * 0.25;
+  camera.position.x = cameraBasePosition.x + Math.sin(t * 0.35) * 0.25;
+  camera.position.z = cameraBasePosition.z + Math.cos(t * 0.35) * 0.25;
   camera.lookAt(0, 0, 0);
 
+  ambientHearts.children.forEach((h) => {
+    h.position.y = h.userData.baseY + Math.sin(t * 1.1 + h.userData.phase) * 0.18;
+    h.rotation.y = t * 0.25 + h.userData.phase;
+  });
+
   greenGlow.position.y = 4.4 + Math.sin(t * 1.8) * 0.6;
+  foodLight.intensity = 2.4 + Math.sin(t * 2.5) * 0.7;
 
   renderer.render(scene, camera);
 }

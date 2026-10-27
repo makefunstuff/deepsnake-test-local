@@ -8,7 +8,7 @@ Eat donuts, avoid walls, and try not to eat yourself.
 ## Controls
 
 - Arrow keys or `WASD` to turn
-- Swipe on touch devices
+- On phones, use the on-screen arrow pad, or swipe
 - `Space` / `Enter` to restart after a crash
 
 ## Run locally
